@@ -1,6 +1,6 @@
 // RobotSpeak Service Worker — Bulletproof Offline
-const CACHE_NAME = 'robotspeak-v10';
-const ASSETS = ['./index.html', './manifest.json', './icon-192.svg', './icon-512.svg'];
+const CACHE_NAME = 'robotspeak-v11';
+const ASSETS = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-192.svg', './icon-512.svg'];
 
 // Install: precache
 self.addEventListener('install', e => {
