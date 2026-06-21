@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f172a">
+<title>RobotSpeak · 工业机器人英语口语</title>
+<link rel="icon" type="image/svg+xml" href="icon-192.svg">
+<link rel="manifest" href="manifest.json">
+<style>
+/* ===== THEME ENGINE ===== */
+:root {
+  --radius: 14px;
+  --safe: env(safe-area-inset-bottom, 12px);
+}
+/* Dark Navy (默认) */
+body,.theme-dark{
+  --theme-name:'暗夜蓝';
+  --bg:#0f172a;--card:#1e293b;--card2:#253349;
+  --border:#334155;--card-border:#1e293b;
+  --accent:#3b82f6;--accent2:#22d3ee;
+  --green:#4ade80;--yellow:#fbbf24;--red:#f87171;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --play-bg:#1e3a5f;--fav-on-bg:#4a3f0a;
+  --flash-again:#451a1a;--flash-hard:#3d2e0a;--flash-good:#0a3a1a;
+  --offline-bg:#3d2e0a;--offline-border:#4a3f0a;
+  --vt-active-bg:#1e3a5f;--vt-active-color:var(--accent2);
+  --dialog-card-bg:var(--card2);
+}
+/* Forest Green (护眼绿) */
+.theme-forest{
+  --theme-name:'护眼绿';
+  --bg:#0d1f0d;--card:#162816;--card2:#1f351f;
+  --border:#2d4a2d;--card-border:#1a2a1a;
+  --accent:#4ade80;--accent2:#86efac;
+  --green:#4ade80;--yellow:#facc15;--red:#f87171;
+  --text:#d1fae5;--text2:#6ee7b7;--text3:#4a7a5a;
+  --play-bg:#0a2e0a;--fav-on-bg:#1a3a0a;
+  --flash-again:#2a1515;--flash-hard:#2a250a;--flash-good:#0a2a0a;
+  --offline-bg:#1a2a0a;--offline-border:#2a3a0a;
+  --vt-active-bg:#0a2a0a;--vt-active-color:var(--accent2);
+  --dialog-card-bg:var(--card2);
+}
+/* Warm Amber (暖色琥珀) */
+.theme-amber{
+  --theme-name:'暖色琥珀';
+  --bg:#1c1917;--card:#292524;--card2:#38312c;
+  --border:#4a3e38;--card-border:#292524;
+  --accent:#f59e0b;--accent2:#fbbf24;
+  --green:#84cc16;--yellow:#fbbf24;--red:#f87171;
+  --text:#fef3c7;--text2:#fcd34d;--text3:#8b7355;
+  --play-bg:#3a2e0a;--fav-on-bg:#3a2810;
+  --flash-again:#3a1515;--flash-hard:#3a2e0a;--flash-good:#1a2a0a;
+  --offline-bg:#3a2e0a;--offline-border:#4a3a0a;
+  --vt-active-bg:#3a2e0a;--vt-active-color:var(--accent2);
+  --dialog-card-bg:var(--card2);
+}
+/* Minimal Light (简约亮色) */
+.theme-light{
+  --theme-name:'简约亮色';
+  --bg:#f1f5f9;--card:#ffffff;--card2:#f1f5f9;
+  --border:#e2e8f0;--card-border:#e2e8f0;
+  --accent:#2563eb;--accent2:#0284c7;
+  --green:#16a34a;--yellow:#ca8a04;--red:#dc2626;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --play-bg:#e0e7ff;--fav-on-bg:#fef3c7;
+  --flash-again:#fee2e2;--flash-hard:#fef3c7;--flash-good:#dcfce7;
+  --offline-bg:#fef3c7;--offline-border:#fcd34d;
+  --vt-active-bg:#e0e7ff;--vt-active-color:var(--accent);
+  --dialog-card-bg:#f8fafc;
+}
+.theme-light .tab{color:var(--text2)}
+.theme-light .tab.active{color:#fff}
+.theme-light .sp-btn.play{color:var(--accent)}
+.theme-light .sp-btn.fav{color:var(--yellow)}
+.theme-light .fc-btn.again{color:var(--red)}
+.theme-light .fc-btn.hard{color:var(--yellow)}
+.theme-light .fc-btn.good{color:var(--green)}
+.theme-light .flashcard-front{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.theme-light header{border-bottom-color:var(--border);background:var(--card)}
+.theme-light .dialogue-card{border-left-color:var(--accent2)}
+/* Theme toggle button */
+.theme-toggle{
+  position:absolute;top:10px;right:12px;z-index:11;
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--border);background:var(--card);
+  font-size:15px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;transition:.2s;
+}
+.theme-toggle:active{transform:scale(.9)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{overscroll-behavior-y:none}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100dvh;padding-bottom:calc(80px + var(--safe));
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
+  user-select:none;-webkit-user-select:none;
+}
+header{
+  position:sticky;top:0;z-index:10;
+  background:var(--bg);border-bottom:1px solid var(--card-border);
+  padding:12px 16px 0;
+}
+header h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
+header p{font-size:11px;color:var(--text3);margin-top:2px}
+.offline-bar{
+  display:none;align-items:center;justify-content:center;gap:6px;
+  padding:6px;background:var(--offline-bg);color:var(--yellow);
+  font-size:11px;font-weight:600;border-bottom:1px solid var(--offline-border);
+}
+.offline-bar.show{display:flex}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;padding:12px 0 10px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;
+  font-weight:600;white-space:nowrap;cursor:pointer;transition:.15s;
+  background:var(--card);color:var(--text2);border:1px solid transparent;
+}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Main content */
+main{padding:12px 14px}
+
+/* Cards */
+.card{
+  background:var(--card);border-radius:var(--radius);padding:16px;
+  margin-bottom:12px;border:1px solid var(--border);
+}
+.card-title{
+  font-size:13px;font-weight:700;color:var(--accent2);
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.card-title .emoji{font-size:16px}
+
+/* Sentence pattern card — flippable with 3D animation */
+.sp-card{cursor:pointer;overflow:visible}
+.sp-layers{display:grid;perspective:800px;transform-style:preserve-3d}
+.sp-front,.sp-back{grid-area:1/1;backface-visibility:hidden;transition:transform .45s ease;display:flex;flex-direction:column;justify-content:center}
+.sp-front{position:relative;transform:rotateY(0deg)}
+.sp-back{transform:rotateY(180deg)}
+.sp-card.flipped .sp-front{transform:rotateY(-180deg)}
+.sp-card.flipped .sp-back{transform:rotateY(0deg)}
+.sp-ex{font-size:14px;font-weight:600;line-height:1.55;color:var(--accent2);margin-bottom:10px}
+.sp-ex+.sp-ex2{margin-top:-6px;padding-top:8px;border-top:1px dashed var(--border)}
+.sp-ex-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.sp-ex-hint{font-size:11px;color:var(--text3);margin-top:8px;font-style:italic}
+.sp-flip-indicator{font-size:10px;color:var(--text3);text-align:center;margin-top:8px;opacity:.6;margin-bottom:2px}
+.sp-id{position:absolute;top:0;right:0;font-size:10px;color:var(--text3);font-weight:700}
+.sp-en{font-size:16px;font-weight:600;line-height:1.55;letter-spacing:.1px}
+.sp-en .hl{color:var(--accent2);font-weight:700}
+.sp-zh{font-size:13px;color:var(--text3);margin-top:6px}
+.sp-replace{font-size:11px;color:var(--text3);margin-top:6px;font-style:italic}
+.sp-actions{display:flex;gap:8px;margin-top:12px}
+.sp-btn{
+  font-size:11px;padding:6px 12px;border-radius:20px;border:none;
+  cursor:pointer;font-weight:600;transition:.15s;
+  background:var(--card2);color:var(--text2);
+}
+.sp-btn.play{background:var(--play-bg);color:var(--accent)}
+.sp-btn.play:active{background:var(--accent);color:#fff}
+.sp-btn.fav{background:var(--play-bg);color:var(--yellow)}
+.sp-btn.fav.on{background:var(--fav-on-bg);color:var(--yellow)}
+
+/* Dialogue card */
+.dialogue-card{background:var(--dialog-card-bg);border-left:3px solid var(--accent2)}
+.dialogue-card .card-title{color:var(--accent2)}
+.dialogue-line{margin:6px 0;font-size:13px;line-height:1.6}
+.dialogue-label{font-weight:700;font-size:11px;color:var(--accent2);margin-top:10px;display:block}
+.dialogue-label:first-child{margin-top:0}
+
+/* Vocabulary table */
+.vocab-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;border-bottom:1px solid var(--card-border);font-size:13px;
+}
+.vocab-row:last-child{border-bottom:none}
+.vocab-en{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vocab-zh{color:var(--text2);flex-shrink:0}
+.vocab-hint{font-size:11px;color:var(--text3)}
+
+/* === Practice play-all mode === */
+.pr-header{
+  display:flex;gap:10px;align-items:center;margin-bottom:12px;
+  padding:14px 16px;background:var(--card);border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+.pr-info{flex:1;min-width:0}
+.pr-title{font-size:13px;font-weight:700;color:var(--accent2)}
+.pr-detail{font-size:11px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pr-gap-ctrl{display:inline-flex;align-items:center;gap:3px}
+.pr-gap-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;transition:.15s;flex-shrink:0}
+.pr-gap-btn:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pr-gap-val{font-size:12px;font-weight:700;color:var(--accent2);min-width:28px;text-align:center}
+.pr-btn{
+  flex-shrink:0;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;transition:.15s;
+}
+.pr-btn.play{background:var(--accent);color:#fff}
+.pr-btn.play:active{transform:scale(.96)}
+.pr-btn.stop{background:var(--red);color:#fff}
+.pr-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:11px 12px;border-radius:10px;margin-bottom:4px;
+  background:var(--card);border:1px solid transparent;
+  font-size:13px;line-height:1.5;transition:.2s;
+}
+.pr-item.active{border-color:var(--accent2);background:var(--card2)}
+.pr-item.done{border-color:transparent;opacity:.5}
+.pr-idx{flex-shrink:0;font-size:12px;font-weight:700;color:var(--accent);min-width:28px;text-align:center}
+.pr-txt{flex:1;min-width:0}
+.pr-zh{font-size:11px;color:var(--text3)}
+.pr-en{font-weight:600;word-break:break-word}
+.pr-item.active .pr-en{color:var(--accent2)}
+.pr-tag{flex-shrink:0;font-size:9px;padding:2px 6px;border-radius:6px;background:var(--card2);color:var(--text3)}
+
+/* === Flashcard speak button === */
+.fc-speak{
+  position:absolute;top:12px;right:14px;
+  width:36px;height:36px;border-radius:50%;
+  border:none;background:var(--play-bg);color:var(--accent2);
+  font-size:16px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;transition:.15s;
+}
+.fc-speak:active{background:var(--accent);color:#fff}
+
+/* Flashcard mode */
+.flashcard{perspective:600px;height:220px;margin-bottom:16px;cursor:pointer}
+.flashcard-inner{
+  position:relative;width:100%;height:100%;transition:transform .4s;
+  transform-style:preserve-3d;
+}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg)}
+.flashcard-front,.flashcard-back{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:var(--radius);padding:24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;
+}
+.flashcard-front{background:var(--card);border:2px solid var(--border)}
+.flashcard-back{background:var(--card2);border:2px solid var(--accent);transform:rotateY(180deg)}
+.flashcard-front .word{font-size:26px;font-weight:700}
+.flashcard-front .hint{font-size:13px;color:var(--text3)}
+.flashcard-back .answer{font-size:24px;font-weight:700;color:var(--accent2)}
+.flashcard-back .extra{font-size:13px;color:var(--text2);text-align:center}
+.flashcard-ctrl{display:flex;gap:12px;justify-content:center;margin-top:8px}
+.fc-btn{padding:10px 20px;border-radius:20px;border:none;font-size:13px;font-weight:600;cursor:pointer}
+.fc-btn.again{background:var(--flash-again);color:var(--red)}
+.fc-btn.hard{background:var(--flash-hard);color:var(--yellow)}
+.fc-btn.good{background:var(--flash-good);color:var(--green)}
+
+/* Sub-toggle inside flashcard mode */
+.vocab-toggle{
+  display:flex;gap:4px;margin-bottom:10px;
+}
+.vocab-toggle .vt{
+  flex:1;padding:6px;border-radius:10px;font-size:11px;font-weight:600;
+  border:1px solid var(--border);background:var(--card);color:var(--text2);
+  cursor:pointer;text-align:center;transition:.15s;
+}
+.vocab-toggle .vt.active{background:var(--vt-active-bg);color:var(--vt-active-color);border-color:var(--accent)}
+
+/* Bottom nav */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--border);
+  display:flex;padding:8px 0 var(--safe);
+  z-index:10;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;font-size:10px;color:var(--text3);padding:4px 0;
+}
+.nav-item .nv{font-size:18px}
+.nav-item.active{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="theme-toggle" id="themeBtn" onclick="cycleTheme()" title="切换主题">🌙</button>
+  <h1><img src="icon-192.svg" alt="" style="width:22px;height:22px;vertical-align:-3px;border-radius:4px"> RobotSpeak <span style="font-size:10px;color:var(--text3);font-weight:400">v10</span></h1>
+  <p>工业机器人专业英语口语 · Dan Koe + HeyMatt + 邵艾伦</p>
+  <div class="tabs" id="topics"></div>
+</header>
+
+<div class="offline-bar" id="offlineBar">📡 你正在离线使用 · 所有内容已缓存到本地</div>
+
+<main id="content"></main>
+
+<nav class="bottom-nav">
+  <div class="nav-item active" data-nav="browse"><div class="nv">📖</div>句模浏览</div>
+  <div class="nav-item" data-nav="flashcard"><div class="nv">🎴</div>单词闪卡</div>
+  <div class="nav-item" data-nav="practice"><div class="nv">🎙️</div>跟读训练</div>
+</nav>
+
+<script>
+// ==================== DATA ====================
+const DATA = {
+  "robot-anatomy": {
+    title: "机器人结构",
+    emoji: "🦾",
+    patterns: [
+      {id:"001",en:'This robot is <span class="hl">designed to</span> weld car body panels.',zh:'这台机器人<b>设计用于</b>焊接汽车车身板。',replace:'designed to → used for / set up for',ex:'So this one\'s <b>set up for</b> palletizing — it stacks boxes onto a pallet, runs about 800 per hour.',ex2:'The one in the back? That\'s <b>used for</b> machine tending, loads and unloads a CNC all day.'},
+      {id:"002",en:'It\'s got <span class="hl">six degrees of freedom</span>, so <b>basically</b> it can get at anything in front of it.',zh:'它有<b>六个自由度</b>，<b>简单说</b>就是能碰到它前面任何位置。',replace:'six → four / seven',ex:'This little SCARA? Only <b>four axes</b>, but for pick-and-place on a flat table, that\'s all you really need.',ex2:'A <b>seven-axis</b> robot gives you that extra bit of flexibility — helps when you\'re reaching around fixtures and stuff.'},
+      {id:"003",en:'The <span class="hl">payload</span> on this one is <span class="hl">20 kilos</span>.',zh:'这台机器人的<b>负载</b>是<b>20公斤</b>。',replace:'20 kg → 5 / 50 / 200',ex:'That big palletizer? <b>200 kilos</b> payload. It can lift an engine block, no problem.',ex2:'Just remember — the <b>payload</b> includes the gripper too. So your part can only be about 15 kilos if the gripper weighs 5.'},
+      {id:"004",en:'The <span class="hl">end-effector</span> — that\'s the tool on the end — is a pneumatic gripper.',zh:'<b>末端执行器</b>——就是手臂末端那个工具——是一个气动夹爪。',replace:'a pneumatic gripper → a welding torch / a suction cup / a camera',ex:'For handling glass, we\'re using a <b>vacuum suction cup</b> with 12 little pads, works great.',ex2:'We put a quick-change plate on there so the robot can swap <b>tools</b> by itself — gripper to torch in like 3 seconds.'},
+      {id:"005",en:'The <span class="hl">reach</span> on this model is about <span class="hl">1.8 meters</span>.',zh:'这台机器人的<b>臂展</b>大约是<b>1.8米</b>。',replace:'1.8 m → 1.4 / 2.5 / 3.1',ex:'The conveyor is 2 meters wide, so we need at least <b>2.5 meters reach</b> to cover the whole thing.',ex2:'The spec says <b>1.8 meters</b>, but with the gripper on, you really only get around 1.6 — always measure it yourself.'},
+      {id:"006",en:'So you\'ve got the <span class="hl">base</span> at the bottom, the <span class="hl">arm</span>, then the <span class="hl">wrist</span>, and the <span class="hl">end-effector</span> at the tip.',zh:'最下面是<b>底座</b>，然后<b>手臂</b>，然后<b>腕部</b>，最前面是<b>末端执行器</b>。',replace:'',ex:'Bottom to top: <b>base</b> holds it down, two-section <b>arm</b> gives you reach, three-axis <b>wrist</b> aims the tool, and the <b>end-effector</b> does the actual job.',ex2:'If someone asks you "what\'s the difference between the wrist and end-effector" — wrist orients, end-effector does the work.'},
+      {id:"007",en:'Right now it\'s on a <span class="hl">fixed base</span>, but we could put it on a <span class="hl">linear track</span> if we need more reach.',zh:'现在安装在<b>固定底座</b>上，如果需要更大范围可以装<b>直线导轨</b>。',replace:'fixed base → a linear track / a gantry / a mobile platform',ex:'On the car line, we put the arm on a <b>track</b> so it slides between three stations — one robot, three jobs.',ex2:'If floor space is tight, mount it on a <b>gantry</b> overhead. You lose nothing on the ground and the robot just hangs down.'},
+      {id:"008",en:'Each <span class="hl">joint</span> has an AC servo motor with a <span class="hl">harmonic drive</span> gearbox behind it.',zh:'每个<b>关节</b>后都有一台交流伺服电机配<b>谐波减速机</b>。',replace:'harmonic drive → cycloidal drive / planetary gearbox',ex:'Joint 3 takes the most abuse so we went with a <b>cycloidal drive</b> — handles higher torque without breaking a sweat.',ex2:'<b>Harmonic drives</b> are nice because there\'s zero backlash and they fit in tight spots — that\'s why they\'re in pretty much every wrist.'},
+      {id:"009",en:'The <span class="hl">wrist</span> gives you three extra axes just for <span class="hl">orientation</span> — pitch, roll, yaw.',zh:'<b>腕部</b>提供了三个额外自由度专门控制<b>姿态</b>——俯仰、翻滚、偏航。',replace:'orientation → pitch / roll / yaw',ex:'The wrist lets the welding torch hit the seam at any angle — you can tweak <b>pitch, roll, and yaw</b> separately.',ex2:'For drilling, you need a heavy-duty <b>wrist</b> — lots of torque on all three axes to keep the tool square under load.'},
+      {id:"010",en:'We went with a <span class="hl">pneumatic gripper</span> — cheap, simple, easy to fix.',zh:'我们选的是<b>气动夹爪</b>——便宜、简单、好修。',replace:'pneumatic → electric / hydraulic / magnetic',ex:'We actually switched to an <b>electric gripper</b> later — way better force control when you\'re handling delicate stuff.',ex2:'<b>Magnetic</b> is great for flat steel sheets, but useless on aluminum or plastic. Just make sure your parts are actually magnetic.'},
+      {id:"011",en:'The <span class="hl">work envelope</span> — the space it can actually reach — is basically a sphere about 1.5 meters across.',zh:'<b>工作空间</b>——它能到达的范围——大致是一个1.5米的球形。',replace:'a sphere → a cylinder / a rectangular box',ex:'This gantry robot has a <b>rectangular work envelope</b>, 3 by 2 by 1.5 meters — covers the whole pallet area.',ex2:'The catalog shows a nice sphere, but the robot can\'t reach directly behind itself or super close to its own base. The real usable space is smaller.'},
+      {id:"012",en:'This model has a <span class="hl">hollow wrist</span> — all the cables and hoses go <b>through the middle</b>, nothing hanging outside.',zh:'这个型号有<b>中空手腕</b>——所有线缆和管路都<b>从中间穿过</b>，外面干干净净。',replace:'hollow wrist → integrated dress pack',ex:'With the <b>hollow wrist</b>, the welding cables and gas hose all run through the center. No snagging, nothing to rip off.',ex2:'Before hollow wrists, cables wrapped around the outside — after about 100,000 cycles they\'d start fraying. This design basically tripled cable life.'},
+      {id:"013",en:'You can mount it <span class="hl">on the floor</span> or <span class="hl">from the ceiling</span> — same robot, different bracket.',zh:'可以<b>落地装</b>也可以<b>倒挂装</b>——同一个机器人，换个安装板就行。',replace:'on the floor → on the wall / from the ceiling / on a shelf',ex:'We hung it from the <b>ceiling</b> in that tight cell — freed up floor space for the operator to walk around.',ex2:'<b>Wall-mounted</b> is common in injection molding — the robot reaches into the mold from the side, leaves the top open for the crane.'},
+      {id:"014",en:'Cables are all <span class="hl">routed inside</span> the arm so they don\'t catch on anything.',zh:'线缆全部从手臂<b>内部走线</b>，不会勾到东西。',replace:'routed inside → routed outside in a protective sleeve',ex:'This arm\'s too narrow for internal routing, so cables run <b>outside</b> but inside a protective conduit. Works fine.',ex2:'<b>Internal routing</b> is the way to go — cables last maybe three times longer than external ones. Worth the extra cost upfront.'},
+      {id:"015",en:'The <span class="hl">base footprint</span> is tiny — just 300 by 300 millimeters. Takes up almost no floor space.',zh:'<b>底座占地</b>很小——才300×300毫米，几乎不占地方。',replace:'300×300 → 250×250 / 500×500',ex:'With a <b>250 by 250</b> footprint, we squeezed four robots side by side where we used to only fit two.',ex2:'When you\'re picking between two models, go with the smaller <b>footprint</b> — floor space costs real money, especially in clean rooms.'},
+    ],
+    dialogue:{title:"车间现场对话",lines:[
+      {label:"客户",text:"So what can you tell me about this robot?"},
+      {label:"工程师",text:"Alright, so this one's a 6-axis articulated arm. It'll handle 20 kilos, reach out about 1.8 meters. The tool on the end — that's a pneumatic gripper — picks up sheet metal parts. Six axes means it can get at pretty much anything inside its work zone. Simple, reliable, been running in automotive plants for years."}
+    ]}
+  },
+  "motion-control": {
+    title: "运动控制",
+    emoji: "⚙️",
+    patterns: [
+      {id:"101",en:'So the robot moves from A to B using <span class="hl">point-to-point motion</span> — basically it just goes, doesn\'t care about the path.',zh:'机器人用<b>点到点运动</b>从A到B——就是只管到哪，不管怎么走。',replace:'point-to-point → linear / circular / spline',ex:'Between pallet positions, we just use <b>PTP</b>. The path between stacks? Doesn\'t matter.',ex2:'<b>PTP</b> is faster than linear — the controller only syncs the start and end, not every tiny step along the way.'},
+      {id:"102",en:'For welding, you need <span class="hl">linear interpolation</span> — gotta keep the speed steady along the seam.',zh:'焊接需要用<b>直线插补</b>——得沿着焊缝保持恒定速度。',replace:'linear → circular / weave',ex:'For the circular flange, we switched to <b>circular interpolation</b>. The torch just follows the curve, perfectly round.',ex2:'<b>Weave</b> is good for filling wide gaps — the torch oscillates side to side while moving forward.'},
+      {id:"103",en:'The <span class="hl">trajectory</span> is the path plus the speed profile — where you go AND how fast.',zh:'<b>轨迹</b>就是路径加上速度曲线——去哪和跑多快。',replace:'speed → acceleration / jerk',ex:'By smoothing out the <b>acceleration</b>, we cut vibration on Joint 4 by 40%.',ex2:'A <b>trajectory</b> with bad jerk will eat gearboxes. Smoothness is cheap — replacement parts aren\'t.'},
+      {id:"104",en:'The <span class="hl">inverse kinematics</span> takes the tool position you want and figures out what joint angles to use.',zh:'<b>逆运动学</b>根据你要的工具位置算出各关节该转多少度。',replace:'inverse kinematics → forward / differential kinematics',ex:'We ran <b>forward kinematics</b> first — plug in the joint angles and see where the robot ends up, just to double-check before running on the floor.',ex2:'With 6 axes, the IK can give you multiple valid answers — the controller picks the one closest to where the joints already are.'},
+      {id:"105",en:'A <span class="hl">singularity</span> happens when two joint axes line up — the robot basically locks up and loses a degree of freedom.',zh:'<b>奇异点</b>就是两个关节轴对齐时——机器人相当于卡住了，失去一个自由度。',replace:'',ex:'The planner flagged a <b>singularity</b> near home — Joints 4 and 6 were lined up. We dropped in an intermediate waypoint to go around it.',ex2:'If the robot suddenly sounds like it\'s going crazy — speeding up for no reason — you\'re probably hitting a <b>singularity</b>.'},
+      {id:"106",en:'We need to <span class="hl">plan a path that doesn\'t hit anything</span> — squeeze between the fixture and the conveyor.',zh:'得<b>规划一条不撞东西的路径</b>——从夹具和传送带之间挤过去。',replace:'',ex:'The simulation found a <b>collision-free path</b> with only 15 millimeters on each side. Tight, but it works.',ex2:'Always leave at least 10mm safety margin — cables sag, things expand when they heat up. What works on screen might not work on the floor.'},
+      {id:"107",en:'The <span class="hl">trajectory planner</span> makes the path smooth with <span class="hl">continuous acceleration</span> — less wear on the mechanics.',zh:'<b>轨迹规划器</b>用<b>连续加速度</b>把路径做平滑——机械磨损小。',replace:'continuous acceleration → continuous jerk',ex:'With <b>continuous jerk</b>, even the fastest moves feel glass-smooth. Bearings last maybe three times longer.',ex2:'A decent <b>planner</b> respects torque limits too — push past them for even a millisecond and you\'ll trip a servo overload.'},
+      {id:"108",en:'We use <span class="hl">S-curve acceleration</span> — ramps up smoothly instead of slamming on.',zh:'我们用的<b>S曲线加速度</b>——慢慢加上去，不是猛冲。',replace:'S-curve → trapezoidal / bell-shaped',ex:'Tried <b>trapezoidal</b> first. The abrupt start-stop made the gripper drop parts. Switched to S-curve, problem solved.',ex2:'The trade-off: <b>S-curve</b> adds maybe 10-15% to the move time. Fine for precision work, not great for high-speed pick-and-place.'},
+      {id:"109",en:'The controller updates the <span class="hl">joint commands</span> at <span class="hl">1 kilohertz</span> — a thousand times a second.',zh:'控制器以<b>1千赫兹</b>更新<b>关节指令</b>——每秒一千次。',replace:'1 kHz → 500 Hz / 2 kHz / 4 kHz',ex:'For high-speed sorting, we bumped it to <b>4 kHz</b>. Needed that for 120 parts a minute.',ex2:'At <b>500 Hz</b> you can actually see a wobble when the robot changes direction fast. <b>1 kHz</b> is the floor for smooth moves.'},
+      {id:"110",en:'By <span class="hl">cleaning up the approach path</span>, we cut two seconds off the cycle.',zh:'<b>把接近路径优化一下</b>，节拍就砍了两秒。',replace:'two seconds → half a second / 15%',ex:'Instead of coming in from the side, we go in from the top now. Saved <b>15%</b> across all 12 cavities.',ex2:'Biggest time saver: eliminated the retract-and-reapproach. Now it goes straight from drop-off to the next pick-up in one smooth curve.'},
+      {id:"111",en:'The robot <span class="hl">blends between moves</span> — doesn\'t stop at every waypoint, just flows through.',zh:'机器人在<b>运动段之间平滑过渡</b>——不在每个路径点停顿，一路顺过去。',replace:'',ex:'Without <b>blending</b>, the glue robot would pause at every corner. You\'d see a bead at each stop. Customer would complain.',ex2:'You can set the <b>blend radius</b> per waypoint — bigger radius means smoother motion but less precision at corners.'},
+      {id:"112",en:'In <span class="hl">teach mode</span>, you jog each joint with the <span class="hl">pendant</span> — one axis at a time, nice and slow.',zh:'在<b>示教模式</b>下拿着<b>示教器</b>一个轴一个轴点动——慢慢来。',replace:'teach mode → auto mode / manual mode',ex:'Before switching to <b>auto</b>, the operator runs through all positions in <b>teach mode</b> at reduced speed. Just to be safe.',ex2:'Always keep the <b>pendant</b> in your hand inside the cell. In teach mode, YOU have control and the speed is capped at 250 mm/s.'},
+      {id:"113",en:'The max <span class="hl">TCP speed</span> is <span class="hl">2 meters per second</span> — anything faster and safety gets nervous.',zh:'最大<b>TCP速度</b>设的<b>每秒2米</b>——再快安全那边就不干了。',replace:'2 m/s → 1.5 / 3',ex:'In collaborative mode, <b>TCP speed</b> is capped at <b>1.5 m/s</b> — ISO/TS 15066 rule.',ex2:'TCP speed isn\'t the same as joint speed. The tool can be barely moving even if the joints are flying — happens near singularities.'},
+      {id:"114",en:'We <span class="hl">simulated</span> the cycle to make sure the robot won\'t hit its <span class="hl">joint limits</span>.',zh:'我们<b>仿真</b>跑了一遍确认机器人在循环中不会碰到<b>关节限位</b>。',replace:'',ex:'The <b>simulation</b> showed Joint 5 would max out during step three. Changed the approach angle and it\'s fine now.',ex2:'Simulation is great, but always do a dry run at 10% speed before going full tilt. Real cables don\'t always match the CAD.'},
+      {id:"115",en:'If the robot feels a <span class="hl">collision</span>, it <span class="hl">kills power</span> to the motors instantly.',zh:'机器人一检测到<b>碰撞</b>就<b>立刻断电</b>。',replace:'',ex:'A fixture shifted and the robot hit it — <b>cut power</b> in 15 milliseconds. Saved the torch and the fixture.',ex2:'After a <b>collision power cut</b>, you have to physically clear the fault and re-home. It won\'t auto-restart — that\'s by design.'},
+    ],
+    dialogue:{title:"工程师讨论",lines:[
+      {label:"同事",text:"Why's the robot moving so slow between these two points?"},
+      {label:"你",text:"Good catch. Right now it's using point-to-point, which takes a bit of a detour. If we switch to linear interpolation, the end-effector goes in a straight line — probably shaves about 15% off the cycle. We can also smooth out the acceleration a bit, make the whole thing run cleaner."}
+    ]}
+  },
+  "maintenance": {
+    title: "维护故障",
+    emoji: "🔧",
+    patterns: [
+      {id:"201",en:'The problem is <span class="hl">caused by</span> a loose connection in the controller.',zh:'问题是<b>控制器里一个连接松了</b>。',replace:'caused by → overheating / a worn gear / a software bug',ex:'We tracked it down — it was <b>caused by</b> a ribbon cable that wasn\'t fully seated on the I/O board. Pushed it in, problem gone.',ex2:'Intermittent faults are the worst. If the issue only shows up when the robot\'s moving fast, you\'ve <b>probably got a bad connection</b> somewhere.'},
+      {id:"202",en:'The robot <span class="hl">failed to</span> home — stopped about 2 millimeters short.',zh:'机器人<b>没能</b>正常回零——差了大概2毫米。',replace:'',ex:'It <b>failed to</b> pick up the part — vacuum sensor said no suction. Turned out the filter was completely clogged.',ex2:'If it <b>fails to</b> run the program, check the program pointer first. Someone might\'ve deleted a line on the last shift.'},
+      {id:"203",en:'We\'re getting <span class="hl">excessive vibration</span> on high-speed moves, mostly around Joint 2.',zh:'高速运动时<b>震动很大</b>，主要在关节2附近。',replace:'excessive vibration → a weird noise / a position shift',ex:'There\'s a <b>grinding noise</b> when you jog Joint 3 slow. Sounds like a bearing in the gearbox.',ex2:'If the <b>vibration</b> only happens at one speed, try going slightly faster or slower — might just be a resonance thing.'},
+      {id:"204",en:'The <span class="hl">repeatability</span> has dropped from ±0.05 to ±0.2 millimeters.',zh:'<b>重复定位精度</b>从±0.05掉到了±0.2毫米。',replace:'',ex:'The <b>repeatability</b> test showed it drifting — root cause was a worn timing belt on Axis 4. Changed the belt, back to normal.',ex2:'<b>Repeatability</b> doesn\'t just disappear overnight — it degrades slowly. Set an alarm at ±0.1 so maintenance catches it before quality does.'},
+      {id:"205",en:'<span class="hl">One possible reason is</span> the encoder lost its zero after that power outage.',zh:'<b>有可能是因为</b>那次断电后编码器零点丢了。',replace:'',ex:'<b>One possible reason</b> — the backup battery is dead. Was supposed to be changed at the last PM but somebody skipped it.',ex2:'<b>Could also be</b> someone pulled the main breaker while the controller was writing data. Always follow the shutdown sequence.'},
+      {id:"206",en:'Let me <span class="hl">walk you through</span> what I\'ve checked so far.',zh:'我给你<b>捋一下</b>我查了哪些。',replace:'',ex:'So I <b>walked through</b> the error log first, then checked the servo drive LEDs, then pulled the coupling cover — everything\'s clean up to the gearbox.',ex2:'Let me <b>walk you through</b> it: wiring, swapped the drive, ran a joint test. All good. Only thing left is the mechanical side.'},
+      {id:"207",en:'You need to <span class="hl">change the grease</span> in the gearbox every <span class="hl">12,000 hours</span> or so.',zh:'齿轮箱<b>润滑脂</b>大概每<b>一万两千小时</b>要换一次。',replace:'12,000 → 5,000 / 20,000 hours',ex:'In a hot environment like die-casting, we <b>change the grease</b> every <b>5,000 hours</b> — heat breaks it down way faster.',ex2:'Don\'t just go by the clock — pull a sample and look at it. If it\'s dark brown or black, <b>change it</b> right there, doesn\'t matter how many hours.'},
+      {id:"208",en:'The <span class="hl">error log</span> says comm timeout between the controller and the Axis 3 drive.',zh:'<b>错误日志</b>显示控制器和第三轴驱动器之间通信超时。',replace:'comm timeout → overcurrent / encoder fault',ex:'The <b>log</b> also shows an <b>overcurrent</b> on Axis 2 at 14:32 — same time the collision alarm went off. Probably related.',ex2:'Always grab the <b>error log</b> before you clear faults. Without it, you\'re guessing. Guessing costs hours.'},
+      {id:"209",en:'I\'d <span class="hl">check the belt tension</span> first — a loose belt will mess up your positioning every time.',zh:'我建议先<b>查一下皮带张力</b>——皮带松了的话定位必出问题。',replace:'belt tension → gear backlash / coupling alignment',ex:'Checked the <b>belt tension</b> with a meter — 30% below spec. Tightened it up and the accuracy came right back.',ex2:'Also look at the <b>coupling</b> between the motor and gearbox. A bad coupling gives you the same symptoms as a bad belt.'},
+      {id:"210",en:'This thing has been running <span class="hl">24/7</span> for three months with zero <span class="hl">downtime</span>.',zh:'这台设备已经<b>24小时不间断</b>跑了三个月，一次<b>停机</b>都没有。',replace:'',ex:'Running <b>24/7</b> for six months now — only stops are the scheduled PMs. Touch wood.',ex2:'<b>24/7</b> is great, but don\'t skip PM just because it\'s running smooth. The first unplanned <b>downtime</b> will wipe out all the money you saved.'},
+      {id:"211",en:'We did a full <span class="hl">preventive maintenance</span> — checked <span class="hl">backlash</span> on all six axes.',zh:'我们做了一次全面的<b>预防性维护</b>——查了六个轴的<b>反向间隙</b>。',replace:'',ex:'The <b>PM</b> report shows Axis 5 <b>backlash</b> at 0.15 — still within the 0.2 limit, but keep an eye on it next quarter.',ex2:'Every <b>PM</b> visit, take photos. Old grease, belt condition, backlash readings. When something fails, that audit trail saves your backside.'},
+      {id:"212",en:'The pendant is showing <span class="hl">error E-4102</span> — that\'s motor overtemperature.',zh:'示教器报了<b>E-4102</b>——这是电机过热。',replace:'E-4102 → E-1503 / E-2201',ex:'It threw <b>E-4102</b> after running 18 hours in a hot enclosure with no AC. We bolted a fan on the cabinet, hasn\'t happened since.',ex2:'Print out the common <b>error codes</b> and tape them inside the controller door. E-4102 = overtemperature, E-1503 = encoder lost, E-2201 = safety circuit open.'},
+      {id:"213",en:'After you swap the backup battery, you gotta <span class="hl">remaster</span> the robot.',zh:'换了备份电池之后，你得<b>重新校准</b>一下机器人。',replace:'remaster → recalibrate / re-home',ex:'We swapped the battery over the weekend and <b>remastered</b> all axes Monday morning before production kicked in.',ex2:'Here\'s a trick — change the battery while the controller is powered on. Keeps the encoder memory alive so you don\'t even need to <b>remaster</b>.'},
+      {id:"214",en:'The grease in the wrist looks <span class="hl">contaminated</span> — we should flush and refill.',zh:'腕部的润滑脂看起来<b>脏了</b>——得冲洗然后加新的。',replace:'contaminated → discolored / has metal flakes',ex:'The sample had tiny <b>metal flakes</b> in it. Shut it down right there and booked a gearbox inspection.',ex2:'<b>Dirty grease</b> tells you something\'s wrong — ask why. Is a seal torn? Running in a dusty area with no bellows? Fix the cause, not just the symptom.'},
+      {id:"215",en:'We keep a <span class="hl">spare servo drive</span> on the shelf — swap takes about 30 minutes.',zh:'我们架子上备了一个<b>伺服驱动器</b>——换上去大概半小时。',replace:'servo drive → teach pendant / power supply',ex:'Critical spares: a <b>drive</b>, a <b>teach pendant</b>, two <b>power supplies</b>. Worst case we\'re back up in under an hour.',ex2:'A <b>spare drive</b> on the shelf is useless if nobody knows the IP config. Label it, save the parameter file, and train two people on the swap.'},
+    ],
+    dialogue:{title:"车间现场对话",lines:[
+      {label:"现场工程师",text:"The welding robot just stopped mid-cycle. You got any idea what's going on?"},
+      {label:"机器人技术员",text:"Alright, so here's what I've found. There's a weird noise coming from Joint 3. Checked the error log — servo overload alarm. My guess, it's a mechanical bind in the wrist. Wiring looks fine. Next step, I'm gonna pull the end-effector off and see if the joint moves free without load."}
+    ]}
+  },
+  "project-report": {
+    title: "项目汇报",
+    emoji: "📊",
+    patterns: [
+      {id:"301",en:'<span class="hl">The goal here is to</span> put a palletizing cell on the customer\'s floor.',zh:'<b>目标就是</b>在客户现场装一个码垛单元。',replace:'goal → put in / upgrade / commission',ex:'<b>What we\'re doing is</b> upgrading the old welding cell — adding vision-guided seam tracking so it follows the weld automatically.',ex2:'<b>The whole point is to</b> put a second robot on the line — double the throughput without touching the building footprint.'},
+      {id:"302",en:'<span class="hl">Here\'s where we are</span> as of this week.',zh:'<b>这周的情况：</b>',replace:'',ex:'<b>Quick status:</b> mechanical\'s done, electrical is about 80%, commissioning kicks off next Monday.',ex2:'<b>Budget-wise</b>, we\'ve spent 65% of what was allocated. Right on track for this phase.'},
+      {id:"303",en:'<span class="hl">So far we\'ve finished</span> the mechanical install, working on electrical now.',zh:'<b>目前已搞完</b>机械安装，正在做电气。',replace:'mechanical → software commissioning / safety validation',ex:'<b>Done so far:</b> robot\'s mounted, conveyor\'s in, safety fence is up. Next is PLC programming.',ex2:'<b>We just wrapped up</b> the Factory Acceptance Test — system\'s packed and shipping. Site test is June 30.'},
+      {id:"304",en:'We\'re <span class="hl">on schedule</span> — hit every milestone so far.',zh:'目前<b>按计划走</b>——每个节点都踩到了。',replace:'on schedule → a week ahead / two weeks behind',ex:'We\'re actually <b>a week ahead</b> — customer cleared the floor earlier than expected, so we got a head start.',ex2:'We\'re <b>about two weeks behind</b> — safety PLC delivery got delayed. Customer\'s been told, timeline is updated.'},
+      {id:"305",en:'<span class="hl">The tricky part was</span> getting the vision system to talk to their existing PLC.',zh:'<b>难点在于</b>让视觉系统跟他们现有PLC对上话。',replace:'vision system → conveyor tracking / ERP system',ex:'<b>The tricky part was</b> the conveyor encoder — had undocumented scaling factors. Took us two days to figure out the right values.',ex2:'<b>Biggest headache —</b> customer\'s IT firewall. Every packet had 40ms latency. Vision doesn\'t like that.'},
+      {id:"306",en:'<span class="hl">Compared to what they had before</span>, this one\'s 30% faster, 15% less power.',zh:'<b>跟他们以前那套比</b>，这个快30%，用电少15%。',replace:'',ex:'<b>Compared to manual</b>, the cell is 5x faster and scrap dropped from 3% to under 0.3%. That alone covers the cost.',ex2:'<b>Vs the competitor\'s solution</b>, ours has a 20% smaller footprint and runs the same cycle in three fewer seconds.'},
+      {id:"307",en:'We\'re <span class="hl">about 90% there</span> — just gotta wrap up safety validation and train the operators.',zh:'<b>差不多90%了</b>——就差安全验证和操作员培训。',replace:'90% → 75% / 95%',ex:'<b>95% done</b> — only thing left is the site acceptance test this Friday.',ex2:'At <b>75%</b>, the real risk is the software integration. We need two more weeks of programming and testing before we can commission.'},
+      {id:"308",en:'We <span class="hl">hit a snag</span> — the gripper wasn\'t releasing consistently.',zh:'<b>碰到个坎</b>——夹爪有时候不松开。',replace:'gripper → vision system / conveyor belt / PLC',ex:'<b>Hit a snag</b> with the conveyor — belt was slipping under heavy loads. Added tensioners, swapped the worn rollers, fixed.',ex2:'When you <b>hit a snag</b> during commissioning, the customer\'s first question is always "can we still go live on time." Always build in a three-day buffer.'},
+      {id:"309",en:'I\'ll <span class="hl">shoot you the weekly report</span> by Friday EOD.',zh:'<b>周报我周五下班前发你。</b>',replace:'weekly → daily / monthly',ex:'During commissioning week I\'ll <b>send a daily update</b> every evening — you can track issues as they happen.',ex2:'The <b>monthly report</b> goes to management — keep it one page, traffic lights: green for good, yellow for watch, red for blocked.'},
+      {id:"310",en:'The customer wants to <span class="hl">change the pallet pattern</span> — we can do that with a software tweak.',zh:'客户想<b>改一下码垛方式</b>——软件调一下就行。',replace:'',ex:'Customer asked to <b>move the conveyor</b> mid-install. Had to re-plan all the pick positions. Cost us two days.',ex2:'Any <b>change</b> after design freeze should go through a formal change order. Otherwise you\'re doing free work.'},
+      {id:"311",en:'This is our <span class="hl">third time</span> deploying this cell — we\'ve <span class="hl">ironed out</span> most of the bugs.',zh:'这个单元<b>第三次部署</b>了——大部分坑都<b>踩平了</b>。',replace:'',ex:'<b>Fifth deployment</b> now — installation took three days. We\'ve really <b>ironed out</b> everything from the earlier sites.',ex2:'<b>First time</b> we deployed this, it took six weeks, 30 issues. <b>Third time:</b> two weeks, four minor issues. The learning curve is real.'},
+      {id:"312",en:'We\'ve got the <span class="hl">Factory Acceptance Test</span> booked for Tuesday, 9 AM.',zh:'<b>工厂验收测试</b>定在周二上午9点。',replace:'Factory Acceptance Test → Site Acceptance Test / commissioning',ex:'Passed the <b>FAT</b> with zero issues — customer signed off, we ship Thursday.',ex2:'Before the <b>FAT</b>, run the whole checklist yourself at least twice. Catch problems before the customer does — builds trust.'},
+      {id:"313",en:'The <span class="hl">ROI</span> works out to about <span class="hl">14 months</span> — after that, it\'s pure savings.',zh:'<b>投资回报</b>大概<b>14个月</b>——之后就是纯省钱了。',replace:'14 months → 18 months / 2 years',ex:'ROI projection was <b>18 months</b>, but with current volumes we\'re tracking closer to 11. Looking good.',ex2:'When you pitch <b>ROI</b> to the CFO, include labor savings, scrap reduction, and throughput increase — not just "robot vs manual labor."'},
+      {id:"314",en:'<span class="hl">Looking at the timeline</span>, we should be handing over around mid-July.',zh:'<b>看这个时间表</b>，差不多七月中能交付。',replace:'mid-July → late August / early September',ex:'<b>Current timeline</b> says early September — two-week delay from that safety PLC supplier issue.',ex2:'Always give two <b>timelines:</b> the optimistic one and the realistic one with buffers. Nobody complains when you deliver early on the realistic track.'},
+      {id:"315",en:'I\'ve got a <span class="hl">small change I\'d suggest</span> — would knock another 5% off the cycle time.',zh:'我想<b>提个小改动</b>——能再砍5%的节拍时间。',replace:'',ex:'<b>I\'d suggest</b> adding a second gripper station — robot swaps tools mid-cycle, simulation shows 20% faster.',ex2:'Before I <b>suggest</b> anything, I run it in simulation first. Showing a working sim is way more convincing than waving at a whiteboard.'},
+    ],
+    dialogue:{title:"项目周会汇报（1分钟）",lines:[
+      {label:"你",text:"Morning everyone. Quick update on the welding cell project. Mechanical is done, electrical is at 80%, commissioning starts Monday. We're about a week behind — cable delivery was late — but we should catch up next week. The tricky part was getting the vision system synced with their conveyor tracking, but we sorted that out with an encoder-based solution. Next up, finishing the safety fence and running the risk assessment. FAT is still on for July 15. Any questions?"}
+    ]}
+  },
+  "safety": {
+    title: "安全协作",
+    emoji: "🛡️",
+    patterns: [
+      {id:"401",en:'<span class="hl">Safety-wise</span>, we need light curtains around the cell.',zh:'<b>安全方面</b>，单元周围得装安全光幕。',replace:'',ex:'<b>Safety-wise</b>, we also need floor markings for the restricted zone. Light curtains alone won\'t cut it per the risk assessment.',ex2:'<b>Safety-wise</b>, the biggest risk isn\'t the robot — it\'s the operator bypassing an interlock because "it saves time." That\'s how people get hurt.'},
+      {id:"402",en:'The safety system is <span class="hl">designed to stop</span> the robot the moment any interlock breaks.',zh:'安全系统<b>设计上就是</b>一旦有互锁信号断了就立马停机。',replace:'',ex:'System <b>stops</b> everything within 50 milliseconds of an interlock break. We measured it — verified.',ex2:'"<b>Designed to stop</b>" is the key phrase — every robot has it, but unless you test it, you don\'t actually know if it works.'},
+      {id:"403",en:'It\'s got <span class="hl">collision detection</span> — hits a force threshold, triggers an emergency stop.',zh:'有<b>碰撞检测</b>——超过力的阈值就触发急停。',replace:'',ex:'During testing it tripped at 65 newtons — way under the 150N limit in ISO/TS 15066 for collaborative work.',ex2:'<b>Collision detection</b> sensitivity is tricky — too low and it stops for nothing; too high and it won\'t stop in time. Got to tune it per application.'},
+      {id:"404",en:'Unlike a traditional robot, a cobot is <span class="hl">meant to work right next to people</span> — no fence needed.',zh:'跟传统机器人不一样，协作机器人<b>就是设计来跟人一起干的</b>——不用围栏。',replace:'',ex:'Old cell had 3-meter fences. This cobot cell? The operator hands parts directly to the robot. No barrier.',ex2:'"<b>Meant to work next to people</b>" doesn\'t mean it\'s always safe. If the cobot is holding a sharp tool or a hot part, it still has to stop.'},
+      {id:"405",en:'The cobot <span class="hl">slows down</span> the moment someone steps into its zone.',zh:'有人一进它的区域，协作机器人就<b>减速</b>。',replace:'slows down → comes to a full stop',ex:'With the area scanner on, it <b>stops completely</b> when someone gets within 0.8 meters. Starts again when they back off.',ex2:'It <b>drops to 250 mm/s</b> — slow enough that a person can easily dodge, fast enough that production doesn\'t grind to a halt every time someone walks past.'},
+      {id:"406",en:'We did a <span class="hl">risk assessment</span> — found three hazards that need addressing.',zh:'我们做了<b>风险评估</b>——找到三个要处理的危险点。',replace:'three → five / seven',ex:'The <b>risk assessment</b> flagged <b>five hazards</b>: pinch points at the gripper, hot surfaces from welding, and parts shooting out during high-speed moves.',ex2:'A <b>risk assessment</b> isn\'t one-and-done. Update it every time you swap the end-effector, change the layout, or change the application. Old assessment = worthless.'},
+      {id:"407",en:'<span class="hl">Never, ever bypass</span> a safety interlock — not even for testing.',zh:'<b>绝对不要去旁路</b>安全互锁——测试也不行。',replace:'',ex:'Operator <b>bypassed</b> the light curtain last month to clean while the robot was running. We shut everything down and retrained the whole shift.',ex2:'If you absolutely have to <b>bypass</b> something for troubleshooting, you need lockout-tagout, a safety-rated bypass plug with a timer, and a second person on the E-stop.'},
+      {id:"408",en:'The <span class="hl">safety PLC</span> runs <span class="hl">separately</span> from the main controller — monitors all the E-stops and light curtains on its own.',zh:'<b>安全PLC</b>是<b>独立于</b>主控制器的——自己监控所有的急停回路和安全光幕。',replace:'',ex:'Even if the main controller crashes, the <b>safety PLC</b> keeps running on its own — fires a Category 0 stop straight through the safety relays.',ex2:'Ideally the <b>safety PLC</b> and main controller should be from different vendors, or at least different chips. Avoids a single software bug taking down everything.'},
+      {id:"409",en:'We set up <span class="hl">safety-rated soft limits</span> — software boundaries the robot can\'t cross.',zh:'我们设了<b>安全等级的软限位</b>——机器人不能越过的软件边界。',replace:'soft limits → hard stops / area scanners',ex:'The <b>soft limits</b> keep the robot out of the manual loading station — even if someone programs a move into that zone, it won\'t go there.',ex2:'<b>Hard stops</b> are mechanical — they can\'t fail from a software bug. Combine hard stops with soft limits for defense in depth.'},
+      {id:"410",en:'Every operator has to go through <span class="hl">safety training</span> before they touch the robot.',zh:'每个操作人员上岗前都得参加<b>安全培训</b>。',replace:'',ex:'<b>Training</b> covers E-stop locations, lockout-tagout, and what to do if the robot does something unexpected in auto mode.',ex2:'<b>Safety training</b> is NOT a checkbox. Test them with a real scenario — "the robot stopped mid-cycle, you need to grab a part, show me what you do." Watch what they actually do.'},
+      {id:"411",en:'The risk assessment says <span class="hl">entanglement</span> is the number one hazard here.',zh:'风险评估把<b>缠绕</b>列为头号危险。',replace:'entanglement → crushing / impact / ejection',ex:'For press-tending, <b>crushing</b> is the big one — we\'re using dual-channel light curtains with a 500mm safety distance.',ex2:'<b>Entanglement</b> gets overlooked a lot — loose sleeve near a spinning deburring tool? That\'s a disaster waiting to happen.'},
+      {id:"412",en:'In <span class="hl">collaborative mode</span>, force is capped at <span class="hl">150 newtons</span> — that\'s the ISO/TS 15066 limit.',zh:'在<b>协作模式下</b>，力限制在<b>150牛</b>——这是ISO/TS 15066规定的。',replace:'150 N → 65 N / 120 N',ex:'For head-area contact, we cap it at <b>65 newtons</b> — that\'s the max allowed for quasi-static contact with the face.',ex2:'Force limiting in <b>collab mode</b> must be validated with a measurement device — don\'t just trust the spec sheet. Actual force depends on speed, payload, and contact angle.'},
+      {id:"413",en:'We <span class="hl">measured the stop time</span> to figure out how far the light curtain needs to be.',zh:'我们<b>实测了停止时间</b>来算安全光幕该放多远。',replace:'',ex:'<b>Stop time</b> came back at 180 milliseconds from signal to full stop at max speed. So the light curtain needs to be at least 360mm from the danger zone.',ex2:'Re-measure <b>stop time</b> after any software update or parameter change. A tiny acceleration tweak can add 50 milliseconds — and that changes your safety distance.'},
+      {id:"414",en:'The <span class="hl">safety validation report</span> has to be signed off before we go live.',zh:'<b>安全验证报告</b>签字了才能投产。',replace:'',ex:'The <b>validation report</b> confirmed every interlock, light curtain, and E-stop works — signed by us AND the customer\'s safety officer.',ex2:'Keep that <b>safety report</b> on file forever. If there\'s an accident and you can\'t produce it, the legal blame lands entirely on you.'},
+      {id:"415",en:'We\'ve got <span class="hl">E-stops</span> at three spots around the cell — gotta be able to reach one fast.',zh:'单元周围设了<b>三个急停按钮</b>——必须能快速摸到。',replace:'three → two / four / six',ex:'Added a <b>fourth E-stop</b> near the manual loading station — operators said the nearest one was always blocked by pallets during busy shifts.',ex2:'If an <b>E-stop</b> takes more than two seconds to reach, it\'s too far. Walk the cell with a stopwatch and test every position.'},
+    ],
+    dialogue:{title:"安全审查对话",lines:[
+      {label:"安全官",text:"What safety measures do you have in place for the new palletizing cell?"},
+      {label:"你",text:"Alright, so we've got layers. First, there's a physical fence with interlocked gates — any gate opens, the robot stops dead. Second, light curtains at the pallet entry and exit. Third, the robot has its own collision detection as a last line of defense. We've also done the risk assessment per ISO 10218 — residual risk is at an acceptable level. Everything's documented and signed off."}
+    ]}
+  }
+};
+
+// VOCAB keyed by topic (matching the 5 DATA topics)
+const VOCAB = {
+  "robot-anatomy": [
+    ["manipulator","机械手/操作臂","from manipulate = 操作"],
+    ["end-effector","末端执行器","end + effector"],
+    ["EOAT","臂端工具","End-Of-Arm Tooling"],
+    ["actuator","驱动器/执行器","actuate + -or"],
+    ["revolute joint","旋转关节","revolve = 旋转"],
+    ["prismatic joint","棱柱关节/滑动关节","prism = 棱柱"],
+    ["link","连杆","两个关节间的刚性杆"],
+    ["wrist assembly","腕部组件","类比人手腕"],
+    ["gripper","夹爪/抓手","from grip = 抓紧"],
+    ["teach pendant","示教器","teach + pendant"],
+    ["payload","有效负载","pay + load"],
+    ["DOF","自由度","Degrees of Freedom"],
+    ["harmonic drive","谐波减速机","高精度减速器"],
+    ["hollow wrist","中空手腕","线缆从内部走"],
+    ["base footprint","底座占地面积","节省空间"],
+    ["tool center point (TCP)","工具中心点","末端参考点"],
+    ["counterbalance","平衡装置","抵消重力"],
+  ],
+  "motion-control": [
+    ["kinematics","运动学","kine- = 运动"],
+    ["dynamics","动力学","运动 + 力"],
+    ["trajectory","轨迹","含时间信息的路径"],
+    ["path","路径","纯几何线"],
+    ["singularity","奇异点","关节对齐的特殊位姿"],
+    ["interpolation","插补","两点间生成中间点"],
+    ["repeatability","重复定位精度","多次到达同一位置"],
+    ["accuracy","绝对精度","到达指定位置的能力"],
+    ["jogging","点动","示教器微调"],
+    ["homing","回零/回原点","回到参考零点"],
+    ["jerk","加加速度/冲击","加速度的变化率"],
+    ["blending","平滑过渡","运动段间无缝衔接"],
+    ["TCP speed","TCP速度","工具端线速度"],
+    ["joint limit","关节限位","防止超出行程"],
+    ["teach mode","示教模式","手动编程模式"],
+    ["approach path","接近路径","到达目标前的路径"],
+  ],
+  "maintenance": [
+    ["oscillation","振荡","navigation中振荡"],
+    ["stagnation","停滞","navigation中停滞"],
+    ["detour","绕行","无效率路径"],
+    ["preventive maintenance","预防性维护","定期保养"],
+    ["gearbox","齿轮箱","需要定期换油"],
+    ["servo drive","伺服驱动器","电机驱动装置"],
+    ["encoder","编码器","反馈位置/速度"],
+    ["recalibrate","重新标定","更换零件后必须操作"],
+    ["downtime","停机时间","设备不可用时间"],
+    ["backlash","反向间隙","齿轮啮合间的空隙"],
+    ["remaster","重新校准零位","恢复零点位置"],
+    ["error log","错误日志","故障记录"],
+    ["belt tension","皮带张力","需定期检查"],
+    ["contamination","污染","油脂/传感器污染"],
+    ["spare part","备件","现场储备替换件"],
+  ],
+  "project-report": [
+    ["commission","调试/投产","commissioning阶段"],
+    ["milestone","里程碑","关键节点"],
+    ["site acceptance test","现场验收测试","交付前最后一步"],
+    ["hand over","交付","hand over to customer"],
+    ["cycle time","节拍时间","一个完整周期耗时"],
+    ["palletizing","码垛","箱子叠到托盘上"],
+    ["AGV","自动导引车","Automated Guided Vehicle"],
+    ["AMR","自主移动机器人","Autonomous Mobile Robot"],
+    ["ROI","投资回报率","Return on Investment"],
+    ["factory acceptance test","工厂验收测试","出厂前测试"],
+    ["punch list","遗留问题清单","验收前待处理项"],
+    ["scope creep","范围蔓延","需求不断扩展"],
+    ["change order","变更单","正式变更请求"],
+    ["timeline","时间表","项目进度安排"],
+    ["as-built","竣工","完工状态"],
+  ],
+  "safety": [
+    ["cobot","协作机器人","collaborative robot"],
+    ["interlock","互锁/联锁","门开→机器人停"],
+    ["collision detection","碰撞检测","安全基础功能"],
+    ["light curtain","安全光幕","非接触式防护"],
+    ["E-stop","急停按钮","Emergency Stop"],
+    ["risk assessment","风险评估","ISO 10218要求"],
+    ["safety fence","安全围栏","物理隔离"],
+    ["SIL","安全完整性等级","Safety Integrity Level"],
+    ["bypass","旁路/跳过","绝不应旁路安全装置"],
+    ["safety PLC","安全PLC","独立于主控制器的安全逻辑"],
+    ["soft limit","软限位","软件限制工作空间"],
+    ["stop-time","停止时间","从触发到完全停止"],
+    ["entanglement","缠绕","旋转部件卷入风险"],
+    ["lockout/tagout","上锁/挂牌","维修时断电挂牌"],
+    ["safety-rated","安全等级的","符合安全标准认证"],
+  ],
+  "academic": [
+    ["bimanual","双臂的","bi- = 双，manual = 手"],
+    ["latent representation","潜在表征","AI/ML术语"],
+    ["coordination-aware","协调感知的","论文用语"],
+    ["structural prior","结构先验","AI/ML术语"],
+    ["monolithic baseline","单体基线","AI对比实验基线"],
+    ["exponential decay","指数衰减","数学/ML术语"],
+    ["trajectory-consistent","轨迹一致的","论文用语"],
+    ["uncertainty estimation","不确定性估计","论文核心指标"],
+  ]
+};
+
+// ==================== STATE ====================
+let speakSynth = window.speechSynthesis;
+
+// ==================== RENDER ====================
+function renderTopics() {
+  const topics = document.getElementById('topics');
+  const keys = Object.keys(DATA);
+  topics.innerHTML = keys.map(k => {
+    const d = DATA[k];
+    return `<div class="tab${k===currentTopic?' active':''}" data-topic="${k}">${d.emoji} ${d.title}</div>`;
+  }).join('');
+}
+
+function renderBrowse() {
+  const d = DATA[currentTopic];
+  let html = '';
+  // Sentence patterns
+  d.patterns.forEach(p => {
+    const cleanEn = p.en.replace(/<[^>]*>/g,'').replace(/'/g,"\\'");
+    const cleanEx = (p.ex||'').replace(/'/g,"\\'");
+    html += `<div class="card sp-card" data-id="${p.id}" onclick="flipPatternCard(this,event)">
+      <div class="sp-layers">
+        <div class="sp-front">
+          <div class="sp-id">#${p.id}</div>
+          <div class="sp-en">${p.en}</div>
+          <div class="sp-zh">${p.zh}</div>
+          ${p.replace ? `<div class="sp-replace">↪ ${p.replace}</div>` : ''}
+          <div class="sp-flip-indicator">👆 点击卡片查看例句</div>
+        </div>
+        <div class="sp-back">
+          <div class="sp-ex-label">📝 EXAMPLE</div>
+          <div class="sp-ex">${p.ex||''}</div>
+          ${p.ex2 ? `<div class="sp-ex sp-ex2">${p.ex2}</div>` : ''}
+          <div class="sp-ex-hint">🔙 点击卡片翻回句模</div>
+        </div>
+      </div>
+      <div class="sp-actions">
+        <button class="sp-btn play" onclick="event.stopPropagation();speakCardBtn(this,'${cleanEn}','${cleanEx}')">🔊 听发音</button>
+        <button class="sp-btn fav${favs.has(p.id)?' on':''}" onclick="event.stopPropagation();toggleFav('${p.id}')">${favs.has(p.id)?'⭐':'☆'} ${favs.has(p.id)?'已收藏':'收藏'}</button>
+        <button class="sp-btn" onclick="event.stopPropagation();speakCardBtn(this,'${cleanEn}','${cleanEx}')">🎙️ 跟读</button>
+      </div>
+    </div>`;
+  });
+  // Dialogue
+  if (d.dialogue) {
+    html += `<div class="card dialogue-card"><div class="card-title">💬 ${d.dialogue.title}</div>`;
+    d.dialogue.lines.forEach(l => {
+      html += `<div class="dialogue-line"><span class="dialogue-label">${l.label}:</span> ${l.text}</div>`;
+    });
+    html += `<button class="sp-btn play" style="margin-top:12px" onclick="event.stopPropagation();speak('${d.dialogue.lines.map(l=>l.text).join('. ').replace(/'/g,"\\'")}')">🔊 播放完整对话</button></div>`;
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// === Flashcard mode — all vocab, card/list sub-toggle ===
+let fcIdx = 0, fcFlipped = false;
+function getVocab() {
+  return Object.values(VOCAB).flat();
+}
+function renderFlashcard() {
+  const words = getVocab();
+  let html = `<div class="vocab-toggle">
+    <div class="vt${vocabSub==='card'?' active':''}" onclick="vocabSub='card';renderFlashcard()">🎴 卡片</div>
+    <div class="vt${vocabSub==='list'?' active':''}" onclick="vocabSub='list';renderFlashcard()">📋 列表</div>
+  </div>`;
+  if (vocabSub === 'card') {
+    if (fcIdx >= words.length) fcIdx = 0;
+    const [en, zh, hint] = words[fcIdx];
+    html += `
+      <div style="text-align:center;font-size:12px;color:var(--text3);margin-bottom:0">${fcIdx+1} / ${words.length}</div>
+      <div class="flashcard" onclick="flipCard()"><div class="flashcard-inner">
+        <div class="flashcard-front">
+          <button class="fc-speak" onclick="event.stopPropagation();speak('${en.replace(/'/g,"\\'")}')">🔊</button>
+          <div class="word">${en}</div>
+          <div class="hint">点击翻转 →</div>
+        </div>
+        <div class="flashcard-back"><div class="answer">${zh}</div><div class="extra">${hint}</div></div>
+      </div></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:4px">
+        <button class="pa-btn prev" onclick="fcIdx=(fcIdx-1+words.length)%words.length;fcFlipped=false;renderFlashcard()">⏮</button>
+        <span style="font-size:11px;color:var(--text3);line-height:32px">${fcIdx+1}/${words.length}</span>
+        <button class="pa-btn next" onclick="fcIdx=(fcIdx+1)%words.length;fcFlipped=false;renderFlashcard()">⏭</button>
+      </div>
+      <div class="flashcard-ctrl">
+        <button class="fc-btn again" onclick="rateCard('again')">😰 再练</button>
+        <button class="fc-btn hard" onclick="rateCard('hard')">🤔 困难</button>
+        <button class="fc-btn good" onclick="rateCard('good')">✅ 会了</button>
+      </div>`;
+  } else {
+    html += '<div class="card"><div class="card-title">📋 全部词汇 (' + words.length + '词)</div>';
+    words.forEach(([en,zh,hint]) => {
+      html += `<div class="vocab-row" onclick="speak('${en.replace(/'/g,"\\'")}')"><span class="vocab-en">${en}</span><span class="vocab-zh">${zh}</span><span class="vocab-hint">${hint}</span></div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+function flipCard() { fcFlipped = !fcFlipped; document.querySelector('.flashcard').classList.toggle('flipped', fcFlipped); }
+function rateCard(r) { const w = getVocab(); if (w[fcIdx]) console.log('Rated:', w[fcIdx][0], r); fcFlipped = false; fcIdx++; renderFlashcard(); }
+
+// ==================== TTS ====================
+function speak(text) {
+  if (!speakSynth) return;
+  speakSynth.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/<[^>]*>/g,''));
+  u.lang = 'en-US'; u.rate = 0.85; u.pitch = 1;
+  speakSynth.speak(u);
+}
+
+// ==================== PRACTICE (play-all list mode) ====================
+let prActive = -1, prDone = new Set();
+function startPractice() {
+  mode = 'practice';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === 'practice'));
+  prActive = -1;
+  renderPractice();
+}
+
+function renderPractice() {
+  // Build flat list of all patterns across all topics
+  const all = [];
+  Object.entries(DATA).forEach(([key, d]) => {
+    d.patterns.forEach(p => {
+      all.push({...p, topic:key, topicName:d.emoji+' '+d.title, topicEmoji:d.emoji});
+    });
+  });
+
+  const total = all.length;
+  const completed = prDone.size;
+  const running = prActive >= 0;
+
+  let html = `<div class="pr-header">
+    <div class="pr-info">
+      <div class="pr-title">🎙️ 全部句模顺序播放（${total}句）</div>
+      <div class="pr-detail">${running ? '⏳ 播放中 · ' : ''}${completed}/${total} · 中文1遍 + 英文3遍 · 间隔 <span class="pr-gap-ctrl"><button class="pr-gap-btn" onclick="event.stopPropagation();adjustGap(-1)">−</button><span class="pr-gap-val">${prGap}</span><button class="pr-gap-btn" onclick="event.stopPropagation();adjustGap(1)">+</button></span> 秒</div>
+    </div>`;
+  if (running) {
+    html += `<button class="pr-btn stop" onclick="stopPlayAll()">⏹ 停止</button>`;
+  } else {
+    html += `<button class="pr-btn play" onclick="startPlayAll()">▶ 播放</button>`;
+  }
+  html += `</div>`;
+
+  all.forEach((p, i) => {
+    const cleanEn = p.en.replace(/<[^>]*>/g, '');
+    const cleanZh = p.zh.replace(/<[^>]*>/g, '');
+    const cls = i === prActive ? ' active' : (prDone.has(i) ? ' done' : '');
+    html += `<div class="pr-item${cls}" onclick="speak('${cleanEn.replace(/'/g,"\\'")}')">
+      <div class="pr-idx">${i+1}</div>
+      <div class="pr-txt">
+        <div class="pr-zh">${p.zh}</div>
+        <div class="pr-en">${cleanEn}</div>
+      </div>
+      <div class="pr-tag">${p.topicEmoji}</div>
+    </div>`;
+  });
+  document.getElementById('content').innerHTML = html;
+
+  // Auto-scroll to active item
+  if (prActive >= 0) {
+    setTimeout(() => {
+      const el = document.querySelector('.pr-item.active');
+      if (el) el.scrollIntoView({behavior:'smooth',block:'center'});
+    }, 200);
+  }
+}
+
+let playTimer = null;
+let isPlaying = false;
+let prGap = 3; // seconds between EN repeats
+
+function adjustGap(d) {
+  prGap = Math.max(1, Math.min(10, prGap + d));
+  renderPractice();
+}
+
+function startPlayAll() {
+  prActive = 0; prDone = new Set();
+  isPlaying = true;
+  renderPractice();
+  playNext();
+}
+function stopPlayAll() {
+  clearTimeout(playTimer);
+  speakSynth.cancel();
+  isPlaying = false;
+  prActive = -1;
+  renderPractice();
+}
+
+function playNext() {
+  if (!isPlaying) return;
+  const all = [];
+  Object.values(DATA).forEach(d => d.patterns.forEach(p => all.push(p)));
+  if (prActive >= all.length) {
+    isPlaying = false;
+    prActive = -1;
+    renderPractice();
+    const u = new SpeechSynthesisUtterance('All done. Great practice!');
+    u.lang = 'en-US'; u.rate = 0.85; u.pitch = 1;
+    speakSynth.speak(u);
+    return;
+  }
+  renderPractice();
+  const p = all[prActive];
+  const cleanEn = p.en.replace(/<[^>]*>/g, '');
+  const cleanZh = p.zh.replace(/<[^>]*>/g, '');
+
+  // Play: CN → EN → gap → EN → gap → EN → gap → next sentence
+  let step = 0;
+  const steps = [
+    {text: cleanZh, lang: 'zh-CN', gap: 0},
+    {text: cleanEn, lang: 'en-US', gap: prGap * 1000},
+    {text: cleanEn, lang: 'en-US', gap: prGap * 1000},
+    {text: cleanEn, lang: 'en-US', gap: prGap * 1000},
+  ];
+
+  function runNextStep() {
+    if (!isPlaying) return;
+    if (step < steps.length) {
+      const s = steps[step];
+      const u = new SpeechSynthesisUtterance(s.text);
+      u.lang = s.lang;
+      u.rate = 0.85; u.pitch = 1;
+      u.onend = () => {
+        step++;
+        if (s.gap && step <= steps.length) {
+          playTimer = setTimeout(() => runNextStep(), s.gap);
+        } else {
+          runNextStep();
+        }
+      };
+      u.onerror = () => { step++; runNextStep(); };
+      speakSynth.speak(u);
+    } else {
+      prDone.add(prActive);
+      prActive++;
+      renderPractice();
+      setTimeout(() => {
+        const el = document.querySelector('.pr-item.active');
+        if (el) el.scrollIntoView({behavior:'smooth',block:'center'});
+      }, 200);
+      playTimer = setTimeout(() => { playNext(); }, prGap * 1000);
+    }
+  }
+  runNextStep();
+}
+
+// ==================== FAVS & FLIP ====================
+let favs = new Set(JSON.parse(localStorage.getItem('rs_favs')||'[]'));
+function toggleFav(id, e) {
+  if (favs.has(id)) favs.delete(id); else favs.add(id);
+  localStorage.setItem('rs_favs', JSON.stringify([...favs]));
+  renderBrowse();
+}
+function flipPatternCard(card, e) {
+  if (e.target.closest('button')) return;
+  card.classList.toggle('flipped');
+}
+// 朗读：卡片正面读句模，背面读例句
+function speakCardBtn(btn, en, ex) {
+  const card = btn.closest('.sp-card');
+  if (card && card.classList.contains('flipped')) {
+    speak(ex || en);
+  } else {
+    speak(en);
+  }
+}
+
+// ==================== NAVIGATION ====================
+// 话题切换（顶部标签）— 事件委托
+let currentTopic = 'robot-anatomy';
+document.getElementById('topics').addEventListener('click', function(e) {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  currentTopic = tab.dataset.topic;
+  renderTopics();
+  refreshView();
+});
+
+// 底部导航 — 唯一模式切换入口
+let mode = 'browse';
+let vocabSub = 'card';
+document.querySelector('.bottom-nav').addEventListener('click', function(e) {
+  const item = e.target.closest('.nav-item');
+  if (!item) return;
+  setMode(item.dataset.nav);
+});
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === m));
+  // Show topic tabs only in browse mode
+  document.getElementById('topics').style.display = (m === 'browse') ? '' : 'none';
+  if (m !== 'browse') renderTopics();
+  refreshView();
+}
+
+function refreshView() {
+  if (mode === 'browse') renderBrowse();
+  else if (mode === 'flashcard') { fcIdx = 0; fcFlipped = false; renderFlashcard(); }
+  else if (mode === 'practice') { startPractice(); }
+}
+
+// ==================== REGISTER SW ====================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // When a new SW is detected, force update immediately
+    reg.addEventListener('updatefound', () => {
+      const newSW = reg.installing;
+      newSW.addEventListener('statechange', () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          newSW.postMessage({action:'skipWaiting'});
+          setTimeout(() => location.reload(), 200);
+        }
+      });
+    });
+    // Check for updates every time the page loads
+    reg.update();
+  });
+}
+
+// ==================== OFFLINE DETECTION ====================
+function updateOnlineStatus() {
+  const bar = document.getElementById('offlineBar');
+  if (navigator.onLine) {
+    bar.classList.remove('show');
+  } else {
+    bar.classList.add('show');
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// ==================== THEME SWITCHER ====================
+const THEMES = ['theme-dark','theme-forest','theme-amber','theme-light'];
+const EMOJIS = ['🌙','🌿','🔥','☀️'];
+let themeIdx = parseInt(localStorage.getItem('rs_theme')||'0');
+function applyTheme(i) {
+  themeIdx = i;
+  document.body.className = THEMES[i];
+  document.getElementById('themeBtn').textContent = EMOJIS[i];
+  document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+  localStorage.setItem('rs_theme', i);
+}
+function cycleTheme() { applyTheme((themeIdx+1)%THEMES.length); }
+applyTheme(themeIdx);
+
+// ==================== INIT ====================
+renderTopics();
+renderBrowse();
+</script>
+</body>
+</html>
